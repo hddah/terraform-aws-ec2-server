@@ -11,6 +11,17 @@ resource "aws_security_group" "this" {
   }
 
   dynamic "ingress" {
+    for_each = var.enable_monitoring_port ? [9100] : []
+    content {
+      description = "Node exporter"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = [var.admin_cidr]
+    }
+  }
+
+  dynamic "ingress" {
     for_each = toset(var.open_ports)
     content {
       description = "Port ${ingress.value} public"
